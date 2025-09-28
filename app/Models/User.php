@@ -21,6 +21,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'license_number',
+        'address',
+        'role',
+        'is_approved',
+        'approved_by',
+        'approved_at',
+        'id_document',
+        'rejection_reason',
     ];
 
     /**
@@ -43,6 +52,23 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'approved_at' => 'datetime',
+            'is_approved' => 'boolean',
         ];
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isPharmacist()
+    {
+        return $this->role === 'pharmacist';
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

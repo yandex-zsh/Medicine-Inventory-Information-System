@@ -29,7 +29,19 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->isPharmacist()) {
+                if ($user->is_approved) {
+                    return redirect()->intended(route('pharmacist.dashboard'));
+                } else {
+                    Auth::logout();
+                    return redirect()->route('login')->with('status', 'Your pharmacist account is pending approval.');
+                }
+            }
+            return redirect()->intended(route('dashboard'));
         }
 
         return back()->withErrors([
