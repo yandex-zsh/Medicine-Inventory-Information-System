@@ -30,24 +30,28 @@ class PharmacistController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'generic_name' => 'nullable|string|max:255',
-            'manufacturer' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:0',
-            'minimum_stock_level' => 'required|integer|min:0',
-            'unit_price' => 'required|numeric|min:0',
-            'expiry_date' => 'required|date|after:today',
-            'batch_number' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'nullable|string|max:255',
-            'is_public' => 'boolean',
-            'symptoms_treated' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'generic_name' => 'nullable|string|max:255',
+                'manufacturer' => 'required|string|max:255',
+                'quantity' => 'required|integer|min:0',
+                'minimum_stock_level' => 'required|integer|min:0',
+                'unit_price' => 'required|numeric|min:0',
+                'expiry_date' => 'required|date|after:today',
+                'batch_number' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category' => 'nullable|string|max:255',
+                'is_public' => 'boolean',
+                'symptoms_treated' => 'nullable|string',
+            ]);
 
-        Medicine::create(array_merge($request->all(), ['user_id' => Auth::id()]));
+            Medicine::create(array_merge($request->all(), ['user_id' => Auth::id()]));
 
-        return redirect()->route('pharmacist.dashboard')->with('success', 'Medicine added successfully!');
+            return redirect()->route('pharmacist.dashboard')->with('success', 'Medicine added successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput()->with('add_medicine_modal_open', true);
+        }
     }
 
     public function update(Request $request, Medicine $medicine)
