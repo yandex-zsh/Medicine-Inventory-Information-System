@@ -51,6 +51,11 @@
                             <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $medicine->name }}</h3>
                             <p class="text-sm text-gray-600 mb-1"><strong>Generic:</strong> {{ $medicine->generic_name ?? 'N/A' }}</p>
                             <p class="text-sm text-gray-600 mb-1"><strong>Manufacturer:</strong> {{ $medicine->manufacturer }}</p>
+                            @if ($medicine->image_path)
+                                <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="{{ $medicine->name }}" class="w-full h-32 object-cover mb-4 rounded-md">
+                            @else
+                                <div class="w-full h-32 flex items-center justify-center bg-gray-200 mb-4 rounded-md text-gray-500 text-xs">No Image</div>
+                            @endif
                             <p class="text-lg font-bold text-blue-600 mt-2 mb-2">${{ number_format($medicine->unit_price, 2) }}</p>
                             <p class="text-xs text-gray-500">Expiry: {{ $medicine->expiry_date->format('M d, Y') }}</p>
                             <p class="text-xs text-gray-500">Category: {{ $medicine->category ?? 'N/A' }}</p>

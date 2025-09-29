@@ -89,6 +89,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Public</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -115,6 +116,13 @@
                                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     </label>
                                 </form>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                @if ($medicine->image_path)
+                                    <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="Medicine Image" class="h-10 w-10 object-cover rounded-full">
+                                @else
+                                    No Image
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($medicine->stock_status === 'expired')
@@ -182,10 +190,10 @@
     </div>
 
     <!-- Add Medicine Modal -->
-    <div id="addMedicineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+    <div id="addMedicineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form action="{{ route('pharmacist.medicines.store') }}" method="POST">
+                <form action="{{ route('pharmacist.medicines.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Medicine</h3>
@@ -289,6 +297,13 @@
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Medicine Image</label>
+                                <input type="file" name="image" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                @error('image')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -305,10 +320,10 @@
     </div>
 
     <!-- Edit Medicine Modal -->
-    <div id="editMedicineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+    <div id="editMedicineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="editMedicineForm" method="POST">
+                <form id="editMedicineForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -365,6 +380,16 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Description</label>
                                 <textarea name="description" id="edit_description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Medicine Image</label>
+                                @if (isset($medicine) && $medicine->image_path)
+                                    <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="Medicine Image" class="mt-2 h-20 w-20 object-cover rounded-md">
+                                @endif
+                                <input type="file" name="image" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                @error('image')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                     </div>

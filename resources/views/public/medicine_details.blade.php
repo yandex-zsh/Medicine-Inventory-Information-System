@@ -28,6 +28,15 @@
 
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @if ($medicine->image_path)
+                    <div class="md:col-span-2 flex justify-center mb-4">
+                        <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="{{ $medicine->name }}" class="max-h-80 object-cover rounded-lg shadow-md">
+                    </div>
+                @else
+                    <div class="md:col-span-2 flex justify-center mb-4">
+                        <div class="w-full max-w-sm h-48 flex items-center justify-center bg-gray-200 rounded-lg shadow-md text-gray-500 text-lg">No Image Available</div>
+                    </div>
+                @endif
                 <div>
                     <p class="text-gray-600 font-semibold">Generic Name:</p>
                     <p class="text-gray-900">{{ $medicine->generic_name ?? 'N/A' }}</p>

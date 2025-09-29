@@ -48,6 +48,11 @@
                     <div class="border border-gray-200 rounded-lg p-4 flex flex-col justify-between items-center text-center">
                         <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $medicine->name }}</h4>
                         <p class="text-sm text-gray-600 mb-2">{{ $medicine->manufacturer }}</p>
+                        @if ($medicine->image_path)
+                            <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="{{ $medicine->name }}" class="w-24 h-24 object-cover rounded-full mb-4">
+                        @else
+                            <div class="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-full mb-4 text-gray-500 text-xs">No Image</div>
+                        @endif
                         <p class="text-xl font-bold text-blue-600 mb-4">${{ number_format($medicine->unit_price, 2) }}</p>
                         <a href="{{ route('public.medicines.show', $medicine) }}" class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded">View Details</a>
                     </div>
@@ -65,6 +70,11 @@
                     <div class="border border-gray-200 rounded-lg p-4 flex flex-col justify-between items-center text-center">
                         <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $medicine->name }}</h4>
                         <p class="text-sm text-gray-600 mb-2">{{ $medicine->manufacturer }}</p>
+                        @if ($medicine->image_path)
+                            <img src="{{ asset('storage/' . $medicine->image_path) }}" alt="{{ $medicine->name }}" class="w-24 h-24 object-cover rounded-full mb-4">
+                        @else
+                            <div class="w-24 h-24 flex items-center justify-center bg-gray-200 rounded-full mb-4 text-gray-500 text-xs">No Image</div>
+                        @endif
                         <p class="text-xl font-bold text-blue-600 mb-4">${{ number_format($medicine->unit_price, 2) }}</p>
                         <a href="{{ route('public.medicines.show', $medicine) }}" class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded">View Details</a>
                     </div>

@@ -22,7 +22,8 @@ class Medicine extends Model
         'symptoms_treated',
         'views_count',
         'sales_count',
-        'user_id' // Add user_id here
+        'user_id',
+        'image_path'
     ];
 
     protected $casts = [

@@ -44,9 +44,18 @@ class PharmacistController extends Controller
                 'category' => 'nullable|string|max:255',
                 'is_public' => 'boolean',
                 'symptoms_treated' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
-            Medicine::create(array_merge($request->all(), ['user_id' => Auth::id()]));
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('medicines', 'public');
+            }
+
+            Medicine::create(array_merge($request->except('image'), [
+                'user_id' => Auth::id(),
+                'image_path' => $imagePath,
+            ]));
 
             return redirect()->route('pharmacist.dashboard')->with('success', 'Medicine added successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -74,9 +83,19 @@ class PharmacistController extends Controller
             'category' => 'nullable|string|max:255',
             'is_public' => 'boolean',
             'symptoms_treated' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $medicine->update($request->all());
+        $imagePath = $medicine->image_path;
+        if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($medicine->image_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($medicine->image_path);
+            }
+            $imagePath = $request->file('image')->store('medicines', 'public');
+        }
+
+        $medicine->update(array_merge($request->except('image'), ['image_path' => $imagePath]));
 
         return redirect()->route('pharmacist.dashboard')->with('success', 'Medicine updated successfully!');
     }
@@ -86,6 +105,11 @@ class PharmacistController extends Controller
         // Ensure the pharmacist can only delete their own medicines
         if ($medicine->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        // Delete image if it exists
+        if ($medicine->image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($medicine->image_path);
         }
 
         $medicine->delete();
@@ -108,7 +132,8 @@ class PharmacistController extends Controller
 
     public function showProfile()
     {
-        return view('pharmacist.profile');
+        $user = Auth::user();
+        return view('pharmacist.profile', compact('user'));
     }
 
     public function generateReport(Request $request)
@@ -142,16 +167,18 @@ class PharmacistController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $user = Auth::user();
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
-            'phone' => 'nullable|string|max:20',
-            'license_number' => 'nullable|string|max:50',
-            'address' => 'nullable|string|max:500'
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'license_number' => 'required|string|max:255|unique:users,license_number,' . $user->id,
+            'pharmacy_name' => 'nullable|string|max:255',
+            'pharmacy_address' => 'nullable|string|max:255',
         ]);
 
-        $user = Auth::user();
-        $user->update($request->only(['name', 'email', 'phone', 'license_number', 'address']));
+        $user->update($request->all());
 
         return redirect()->route('pharmacist.profile')->with('success', 'Profile updated successfully!');
     }
@@ -164,7 +191,7 @@ class PharmacistController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
@@ -238,7 +265,7 @@ class PharmacistController extends Controller
         // Update medicine stock and sales count
         $medicine->decrement('quantity', $request->quantity);
         $medicine->increment('sales_count', $request->quantity);
-        
+
         return back()->with('success', 'Sale recorded successfully!');
     }
 }
